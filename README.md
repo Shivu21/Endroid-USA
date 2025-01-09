@@ -1,7 +1,7 @@
 # **Endroid Streaming App**
 
 ## **Overview**
-The **Endroid Streaming App** is a robust Flutter application designed for real-time streaming, device management, and user authentication. It adheres to **Clean Architecture**, utilizes **Firebase** for backend services, **Provider** for state management, and **GetIt** for Dependency Injection. The app integrates **RTSP Streaming** with **VLC Player**, providing an efficient and seamless video streaming experience.
+The **Endroid Streaming App** is a cutting-edge Flutter application built for real-time streaming, device management, and user authentication. It follows **Clean Architecture** principles, incorporates **Firebase** for backend services, uses **Provider** for state management, and **GetIt** for dependency injection. The app allows users to manage multiple RTSP streams efficiently and includes features like dynamic grid layouts, ONVIF device discovery, and custom UI components.
 
 ---
 
@@ -12,6 +12,8 @@ The **Endroid Streaming App** is a robust Flutter application designed for real-
 - [File Structure](#file-structure)
 - [Setup and Installation](#setup-and-installation)
 - [App Modules](#app-modules)
+- [State Management](#state-management)
+- [Pagination](#pagination)
 - [Screenshots and Previews](#screenshots-and-previews)
 - [Contributing](#contributing)
 - [License](#license)
@@ -20,45 +22,49 @@ The **Endroid Streaming App** is a robust Flutter application designed for real-
 
 ## **Features**
 - **Authentication**:
-  - Secure login, signup, and logout using Firebase Authentication.
+  - Firebase Authentication for secure login, signup, and logout.
 - **Real-Time Streaming**:
-  - RTSP streaming with dynamic grid layout.
-  - Support for adding and managing multiple streams.
+  - RTSP streaming with VLC Player integration.
+  - Support for managing multiple streams.
 - **Device Management**:
-  - Discover network cameras via ONVIF.
-  - Manual camera addition or through QR code scanning.
+  - Discover ONVIF cameras.
+  - Add devices manually or through QR code scanning.
 - **State Management**:
-  - Provider for efficient state handling.
-  - Dependency injection using GetIt.
+  - Reactive state updates using Provider.
+  - Dependency injection with GetIt.
 - **Clean Architecture**:
-  - Layered and modularized structure for scalability and maintainability.
-- **Responsive UI**:
-  - Adaptive design for different devices.
+  - Layered design for scalability and maintainability.
+- **Pagination for Streams**:
+  - Lazy loading of stream data for better performance.
 - **Custom UI Components**:
-  - Smooth loading animations using **Flutter Spinkit**.
-  - Alerts and notifications with **Awesome Snackbar Content**.
+  - Loading animations with **Flutter Spinkit**.
+  - Snackbars with **Awesome Snackbar Content**.
+- **Responsive Design**:
+  - Adaptive layouts for different screen sizes and resolutions.
 
 ---
 
 ## **Technologies Used**
 - **Flutter**: For building cross-platform UI.
-- **Firebase**: For backend services like Authentication and Firestore.
-- **Provider**: For state management.
-- **GetIt**: For Dependency Injection.
-- **VLC Player**: For RTSP streaming.
-- **ONVIF**: For camera discovery.
+- **Firebase**: Backend services for authentication and Firestore.
+- **Provider**: State management library.
+- **GetIt**: Dependency injection for decoupled modules.
+- **VLC Player**: RTSP streaming library.
+- **ONVIF**: Camera discovery protocol.
 
 ---
 
 ## **Project Architecture**
-The application is based on **Clean Architecture** principles, providing clear separation between the following layers:
 
-1. **Presentation**:
-   - Contains UI widgets, state management (Provider), and navigation logic.
-2. **Domain**:
-   - Business logic, use cases, and domain entities.
-3. **Data**:
-   - Repositories, models, and data sources (Firebase and other integrations).
+### **Clean Architecture**
+The project adheres to **Clean Architecture** to ensure scalability, maintainability, and testability:
+
+1. **Presentation Layer**:
+   - Contains UI components, state management (via Provider), and navigation logic.
+2. **Domain Layer**:
+   - Includes business logic, use cases, and domain entities.
+3. **Data Layer**:
+   - Comprises repositories, models, and data sources for interacting with Firebase and other APIs.
 
 ---
 
@@ -67,17 +73,31 @@ The application is based on **Clean Architecture** principles, providing clear s
 lib/
 ├── core/                     # Core utilities and services
 │   ├── di/                   # Dependency injection setup
-│   ├── errors/               # Error handling utilities
-│   ├── utils/                # Common utility functions
+│   ├── utils/                # Utility functions and helpers
 ├── features/                 # Feature-based modules
 │   ├── auth/                 # Authentication module
-│   │   ├── data/             # Data sources and models
-│   │   ├── domain/           # Entities, repositories, and use cases
-│   │   ├── presentation/     # UI and providers
-│   ├── stream/               # Streaming module
-│   ├── profile/              # User profile management module
-├── widgets/                  # Shared widgets
-├── main.dart                 # Entry point of the application
+│   │   ├── data/             
+│   │   │   ├── datasources/  # Remote and local data sources
+│   │   │   ├── models/       # Firebase models
+│   │   ├── domain/           
+│   │   │   ├── entities/     # Core business objects
+│   │   │   ├── usecases/     # Business logic
+│   │   ├── presentation/     
+│   │       ├── screens/      # Login and signup screens
+│   │       ├── providers/    # Auth state management
+│   ├── stream/               
+│   │   ├── data/             
+│   │   ├── domain/           
+│   │   ├── presentation/     
+│   ├── profile/              
+│       ├── data/             
+│       ├── domain/           
+│       ├── presentation/     
+├── widgets/                  
+│   ├── custom_snackbar.dart  # Reusable snackbar widgets
+│   ├── stream_grid_view.dart # Stream grid rendering
+│   ├── action_buttons.dart   # Common action buttons
+├── main.dart                 # App entry point
 ```
 
 ---
@@ -97,7 +117,7 @@ flutter pub get
 
 ### **Step 3: Configure Firebase**
 1. Go to the Firebase Console.
-2. Create a project and enable Authentication and Firestore.
+2. Set up a project and enable Authentication and Firestore.
 3. Download the configuration files:
    - `google-services.json` (for Android)
    - `GoogleService-Info.plist` (for iOS)
@@ -115,38 +135,63 @@ flutter run
 ## **App Modules**
 
 ### **Authentication Module**
-- **Data Layer**: Firebase for backend services.
-- **Domain Layer**: User entity and authentication use cases.
-- **Presentation Layer**: Login and Signup screens.
+- **Data Layer**: Firebase integration for authentication.
+- **Domain Layer**: Use cases for login, signup, and logout.
+- **Presentation Layer**: Login and signup screens with Provider for state management.
 
 ### **Stream Module**
-- **Data Layer**: Firestore for storing streams.
-- **Domain Layer**: Business logic for managing streams.
-- **Presentation Layer**: Grid layout for streams and dynamic controls.
+- **Data Layer**: Firestore integration for managing streams.
+- **Domain Layer**: Use cases for handling stream CRUD operations.
+- **Presentation Layer**: Dynamic grid layout for streams with VLC Player integration.
 
 ### **Profile Module**
-- **Data Layer**: Firestore integration.
-- **Domain Layer**: Profile use cases and entity.
-- **Presentation Layer**: Profile screen UI.
+- **Data Layer**: Firestore integration for user profiles.
+- **Domain Layer**: Business logic for profile updates.
+- **Presentation Layer**: Profile management screens.
 
 ---
-## Demo
-![Demo](assets/screenshots/demo.gif)
 
+## **State Management**
+The app uses Provider for reactive state updates:
+
+- **AuthProvider**: Manages user authentication.
+- **StreamProvider**: Handles stream data and CRUD operations.
+- **ProfileProvider**: Manages user profile information.
+
+---
+
+## **Pagination**
+Lazy loading is implemented for efficient loading of stream data:
+
+```dart
+LazyLoadScrollView(
+  onEndOfPage: _loadMoreStreams,
+  child: GridView.builder(
+    itemCount: streams.length,
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+    ),
+    itemBuilder: (context, index) {
+      return StreamCard(stream: streams[index]);
+    },
+  ),
+);
+```
+
+---
 
 ## **Screenshots and Previews**
 
 ### **Login Screen**
-- Secure login with Firebase Authentication.
-![LogIn](assets/screenshots/idle_screen.png)
+- A secure and intuitive interface for user authentication.
 
 ### **Stream Management**
-- Dynamic grid layout for managing multiple RTSP streams.
-![Stream Management](assets/screenshots/incoming_call_screen.png)
+- Manage multiple streams with a dynamic grid layout.
 
 ### **Device Discovery**
-- ONVIF-based camera discovery for seamless integration.
-![Device Discovery](assets/screenshots/in_call_screen.png)
+- Discover ONVIF cameras seamlessly.
 
 ---
 
@@ -178,5 +223,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## **Contact**
 For queries or contributions:
 - **Email**: shivamshakya2111@gmail.com
-- **GitHub**: https://github.com/Shivu21/Endroid-USA
+- **GitHub**: Shivu21
 
